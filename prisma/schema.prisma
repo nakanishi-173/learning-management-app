@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model ProgrammingLanguage {
+  programming_language_id   Int              @id @db.SmallInt
+  programming_language_name String           @db.VarChar
+  created_at                DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime         @default(now()) @db.Timestamptz(6)
+  initialSettings           InitialSetting[]
+
+  @@map("プログラミング言語テーブル")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model UserGoal {
+  user_id        String         @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  goal_id        Int            @id @default(autoincrement()) @db.SmallInt
+  goal_type      Int            @db.SmallInt
+  goal_title     String         @db.VarChar
+  created_at     DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime       @default(now()) @db.Timestamptz(6)
+  initialSetting InitialSetting @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("ユーザー別目標設定テーブル")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model InitialSetting {
+  user_id                 String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  weekday_hours           Int
+  weekday_minutes         Int
+  holiday_hours           Int
+  holiday_minutes         Int
+  created_at              DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime            @default(now()) @db.Timestamptz(6)
+  programming_language_id Int                 @db.SmallInt
+  userGoals               UserGoal[]
+  programmingLanguage     ProgrammingLanguage @relation(fields: [programming_language_id], references: [programming_language_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("初期設定テーブル")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Reflection {
+  user_id       String   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  study_year    Int      @db.SmallInt
+  study_month   Int      @db.SmallInt
+  study_content String   @db.VarChar
+  challenge     String   @db.VarChar
+  improvement   String   @db.VarChar
+  memo          String?  @db.VarChar
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@id([user_id, study_year, study_month])
+  @@map("振り返り入力テーブル")
+}
