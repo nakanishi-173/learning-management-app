@@ -25,13 +25,14 @@ model ProgrammingLanguage {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model UserGoal {
   user_id        String         @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  goal_id        Int            @id @default(autoincrement()) @db.SmallInt
+  goal_id        Int            @default(autoincrement()) @db.SmallInt
   goal_type      Int            @db.SmallInt
   goal_title     String         @db.VarChar
   created_at     DateTime       @default(now()) @db.Timestamptz(6)
   updated_at     DateTime       @default(now()) @db.Timestamptz(6)
   initialSetting InitialSetting @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@id([user_id, goal_id])
   @@map("ユーザー別目標設定テーブル")
 }
 
@@ -68,4 +69,74 @@ model Reflection {
 
   @@id([user_id, study_year, study_month])
   @@map("振り返り入力テーブル")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model StudyRecord {
+  user_id       String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  study_date    DateTime    @db.Date
+  study_hours   Int
+  study_minutes Int
+  subject       String      @db.VarChar
+  memo          String?     @db.VarChar
+  created_at    DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime    @default(now()) @db.Timestamptz(6)
+  studyTasks    StudyTask[]
+
+  @@id([user_id, study_date])
+  @@map("学習記録入力テーブル")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model StudyTask {
+  user_id       String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  study_date    DateTime    @db.Date
+  study_task_id Int         @db.SmallInt
+  study_task    String      @db.VarChar
+  is_completed  Boolean
+  created_at    DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime    @default(now()) @db.Timestamptz(6)
+  studyRecord   StudyRecord @relation(fields: [user_id, study_date], references: [user_id, study_date], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([user_id, study_date, study_task_id])
+  @@map("本日のタスクテーブル")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model UserGoalContent {
+  user_id      String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  goal_id      Int         @db.SmallInt
+  goal_type    Int         @db.SmallInt
+  goal_title   String      @db.VarChar
+  goal_subject String      @db.VarChar
+  is_completed Boolean
+  created_at   DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime    @default(now()) @db.Timestamptz(6)
+  goalSetting  GoalSetting @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([user_id, goal_id])
+  @@map("ユーザー別目標内容設定テーブル")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model GoalSetting {
+  user_id          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  weekday_hours    Int
+  weekday_minutes  Int
+  holiday_hours    Int
+  holiday_minutes  Int
+  memo             String?           @db.VarChar
+  created_at       DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime          @default(now()) @db.Timestamptz(6)
+  userGoalContents UserGoalContent[]
+
+  @@map("目標入力テーブル")
 }

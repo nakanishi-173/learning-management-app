@@ -19,7 +19,6 @@ import {
  } from '@/components/ui/select'
 
 import { Button } from '@/components/ui/button'
-import { supabase } from "@/lib/supabase"
 
 type Task = {
   id: number
@@ -52,64 +51,57 @@ export default function Home() {
   const [memo, setMemo] = useState("")
   const [isSaving, setIsSaving ] = useState(false)
 
-useEffect(() => {
-  const userId = "11111111-1111-1111-1111-111111111111"
-
-  const fetchStudyRecord = async () => {
-    const { data, error } = await supabase
-    .from("学習記録入力テーブル")
-    .select("study_hours, study_minutes, subject, memo")
-    .eq("user_id", userId)
-    .eq("study_date", studyDate)
-    .maybeSingle()
-  
-  if (error) {
-    console.error(error)
-    return
-  }
-
-  if (data) {
-    setStudyHour(String(data.study_hours))
-    setStudyMinute(String(data.study_minutes))
-    setSubject(data.subject)
-    setMemo(data.memo ?? "")
-  } else {
-    setStudyHour("")
-    setStudyMinute("")
-    setSubject("")
-    setMemo("")
-  }
-  }
-  
-  const fetchTasks = async () => {
-    const { data, error } = await supabase
-      .from("本日のタスクテーブル")
-      .select("study_task_id, study_task, is_completed")
-      .eq("user_id", userId)
-      .eq("study_date", studyDate)
-      .order("study_task_id")
-
-    if (error) {
-      console.error(error)
-      return
+  useEffect(() => {
+    const controller = new AbortController()
+    const fetchStudyRecord = async () => {
+      try {
+        const res = await fetch(
+          `/api/study-record?study_date=${studyDate}`,
+          { signal: controller.signal }
+        )
+        if (!res.ok) {
+          console.error("学習記録の取得に失敗しました")
+          return
+        }
+        const data = await res.json()
+        if (data.subject !== null) {
+          setStudyHour(String(data.study_hours))
+          setStudyMinute(String(data.study_minutes))
+          setSubject(data.subject)
+          setMemo(data.memo ?? "")
+        } else {
+          setStudyHour("")
+          setStudyMinute("")
+          setSubject("")
+          setMemo("")
+        }
+        if (data.tasks && data.tasks.length > 0) {
+          setTasks(
+            data.tasks.map((row: {
+              study_task_id: number
+              study_task: string
+              is_completed: boolean
+            }) => ({
+              id: row.study_task_id,
+              text: row.study_task,
+              completed: row.is_completed,
+            }))
+          )
+        } else {
+          setTasks([{ id: 1, text: "", completed: false }])
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          return
+        }
+        console.error(error)
+      }
     }
-
-    if (data && data.length > 0) {
-      setTasks(
-        data.map((row) => ({
-          id: row.study_task_id,
-          text: row.study_task,
-          completed: row.is_completed,
-        }))
-      )
-    } else {
-      setTasks([{ id: 1, text: "", completed: false }])
+    fetchStudyRecord()
+    return () => {
+      controller.abort()
     }
-  }
-
-  fetchStudyRecord()
-  fetchTasks()
-},[studyDate])
+  }, [studyDate])
 
   const handleAddTask = () => {
     setTasks([...tasks, { id: Date.now(), text: "", completed: false }])
@@ -119,67 +111,35 @@ useEffect(() => {
     if (isSaving) return
     setIsSaving(true)
     try {
-      const userId = "11111111-1111-1111-1111-111111111111"
-
-    const hasEmptyflection =
+      const hasEmptyflection =
       !studyDate ||
       !studyHour ||
       !studyMinute ||
       !subject
-    
     if (hasEmptyflection) {
       alert("未入力の項目があります")
       return
     }
-
-    const { error: studyRecordError } = await supabase
-      .from("学習記録入力テーブル")
-      .upsert({
-        user_id: userId,
+    const res = await fetch("/api/study-record", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         study_date: studyDate,
         study_hours: Number(studyHour),
         study_minutes: Number(studyMinute),
-        subject: subject,
-        memo: memo,
-        updated_at: new Date().toISOString(),
-      },
-    {
-      onConflict: "user_id,study_date",
+        subject,
+        memo,
+        tasks: tasks
+          .filter((task) => task.text.trim())
+          .map((task) => ({
+            study_task: task.text,
+            is_completed: task.completed,
+          })),
+      }),
     })
-
-    if (studyRecordError) {
-      alert("学習記録の保存に失敗しました: " + studyRecordError.message)
-      return
-    }
-
-    const taskRows = tasks
-    .filter((task) => task.text.trim())
-    .map((task, index) => ({
-      user_id: userId,
-      study_date: studyDate,
-      study_task_id: index + 1,
-      study_task: task.text,
-      is_completed: task.completed,
-      updated_at: new Date().toISOString(),
-    })) 
-
-    const { error: deleteTaskError } = await supabase
-    .from("本日のタスクテーブル")
-    .delete()
-    .eq("user_id", userId)
-    .eq("study_date", studyDate)
-
-    if (deleteTaskError) {
-      alert("本日のタスクの削除に失敗しました: " + deleteTaskError.message)
-      return
-    }
-
-    const { error : taskError } = await supabase
-    .from("本日のタスクテーブル")
-    .insert(taskRows)
-
-    if(taskError) {
-      alert("本日のタスクの保存に失敗しました: " + taskError.message)
+    if (!res.ok) {
+      const { error } = await res.json()
+      alert(error ?? "学習記録の保存に失敗しました")
       return
     }
     alert("登録しました")
