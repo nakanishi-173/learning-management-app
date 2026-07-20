@@ -20,42 +20,50 @@ import {
 
 import { Input } from "@/components/ui/input"
 
+// 言語1件のデータはid（数字）とname（文字）の2つのプロパティを持つ
 type Language = {
   programming_language_id: number
   programming_language_name: string
 }
 
+// 目標期間区分
 type Period = "short" | "medium" | "long"
 
+// 目標1件のデータはid（数字）とtitle（文字）の2つのプロパティを持つ
 type GoalInput = {
   id: string
   title: string
 }
 
+// 各目標期間区分ごとに目標配列を持つ
 type GoalsByPeriod = {
   short: GoalInput[]
   medium: GoalInput[]
   long: GoalInput[]
 }
 
+// 目標期間区分を番号で管理するための対応表
 const PERIODS: { key: Period; label: string; goalType: number }[] = [
   { key: "short", label: "短期", goalType: 1 },
   { key: "medium", label: "中期", goalType: 2 },
   { key: "long", label: "長期", goalType: 3 },
 ]
 
+// 空の目標を1件作成
 const emptyGoal = (): GoalInput => ({
   id: crypto.randomUUID(),
   title: "",
 })
 
+// 各目標期間区分に空の入力欄を入れる
 const emptyGoalsByPeriod = (): GoalsByPeriod => ({
   short: [emptyGoal()],
-  medium: [],
-  long: [],
+  medium: [emptyGoal()],
+  long: [emptyGoal()],
 })
 
 export default function Home() {
+// 画面上の入力値を保持する
   const [languages, setLanguages] = useState<Language[]>([])
   const [language, setLanguage] = useState("")
   const [goalsByPeriod, setGoalsByPeriod] =
@@ -65,9 +73,11 @@ export default function Home() {
   const [holidayHour, setHolidayHour] = useState("")
   const [holidayMinute, setHolidayMinute] = useState("")
 
+// Select用の時・分の選択肢
   const hours = Array.from({ length: 24 }, (_, i) => i)
   const minutes = Array.from({ length: 60 }, (_, i) => i)
 
+// 画面表示時に初期設定 API から言語・設定を取得してフォームに反映する
   useEffect(() => {
     const fetchInitialSettings = async () => {
       try {
@@ -104,7 +114,9 @@ export default function Home() {
             })
           }
 
-          if (next.short.length === 0) next.short = [emptyGoal()]
+          for (const { key } of PERIODS) {
+            if (next[key].length === 0) next[key] = [emptyGoal()]
+          }
           setGoalsByPeriod(next)
         }
       } catch (error) {
@@ -115,6 +127,7 @@ export default function Home() {
     fetchInitialSettings()
   }, [])
 
+// 登録ボタン押下時: 送信用データを整え、入力チェック後に初期設定APIへPOSTする
   const handleRegister = async () => {
     const goals = PERIODS.flatMap(({ key, goalType }) =>
       goalsByPeriod[key]
@@ -159,6 +172,7 @@ export default function Home() {
     alert("保存しました")
   }
 
+// 目標の追加・更新・削除
   const addGoal = (period: Period) => {
     setGoalsByPeriod((prev) => ({
       ...prev,
@@ -194,6 +208,8 @@ export default function Home() {
 
       <CardContent className="flex flex-col gap-6">
         <div className="flex flex-col gap-6">
+
+         {/* 学習言語 */}
           <Card size="sm">
             <CardContent>
               <p>学習言語</p>
@@ -216,6 +232,7 @@ export default function Home() {
           </Card>
         </div>
 
+        {/* 短期・中期・長期の目標入力 */}
         {PERIODS.map(({ key, label }) => (
           <Card key={key} size="sm">
             <CardContent className="flex flex-col gap-3">
@@ -255,6 +272,8 @@ export default function Home() {
         ))}
 
         <div className="flex flex-col gap-6">
+
+          {/* 平日の目標学習時間 */}
           <Card size="sm">
             <CardContent>
               <p>平日目標学習時間</p>
@@ -296,6 +315,7 @@ export default function Home() {
           </Card>
         </div>
 
+        {/* 休日の目標学習時間 */}
         <Card size="sm">
           <CardContent>
             <p>休日目標学習時間</p>
@@ -337,6 +357,7 @@ export default function Home() {
         </Card>
       </CardContent>
 
+      {/* 保存ボタン */}
       <CardFooter className="mt-6 border-t-0 bg-transparent flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Button className="w-full sm:w-auto" onClick={handleRegister}>
           保存

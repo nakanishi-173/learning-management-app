@@ -18,14 +18,17 @@ import {
 
 import { Button } from '@/components/ui/button'
 
+// 年の選択範囲（2026〜2030）
 const start_year = 2026
 const end_year = 2030
+// Select用の年・月の選択肢
 const years = Array.from(
     { length: end_year - start_year +1 },
     (_, i) => start_year + i
 )
 const months = Array.from({ length: 12 }, (_, i) => i +1 )
 
+// 振り返り入力フォームの型
 type ReflectionInput = {
     studyContent: string
     challenge: string
@@ -34,6 +37,7 @@ type ReflectionInput = {
 }
 
 export default function Home() {
+// 画面上の入力値を保持する
   const [year, setYear] = useState("")
   const [month, setMonth] = useState("")
   const [form, setForm] = useState<ReflectionInput>({
@@ -43,6 +47,7 @@ export default function Home() {
     memo: "",
   })
 
+// 登録ボタン押下時: 入力チェック後に振り返りAPIへPOSTする
   const handleSaveReflection = async () => {
     
     const hasEmptyflection =
@@ -87,6 +92,7 @@ export default function Home() {
     <div className="flex flex-col gap-6">
       <Card size="sm">
       <CardContent>
+        {/* 入力年月選択 */}
         <p>入力年月選択</p>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Select value={year} onValueChange={setYear}>
@@ -117,6 +123,7 @@ export default function Home() {
         <span>月</span>
         </div>
         
+        {/* 振り返りの入力項目 */}
         <div className="flex flex-col my-6 gap-2 sm:gap-3">
         <div>
         <p>主に学習した内容</p>
@@ -168,6 +175,7 @@ export default function Home() {
       </CardContent>
       </Card>
 
+      {/* 登録ボタン */}
       <CardFooter className="mt-6 border-t-0 bg-transparent flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Button onClick={handleSaveReflection}>
           登録

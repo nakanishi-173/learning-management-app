@@ -20,8 +20,10 @@ import {
 
 import { Input } from "@/components/ui/input"
 
+// 目標期間区分
 type Period = "short" | "medium" | "long"
 
+// 目標1件のデータはid・title・content・completedを持つ
 type GoalInput = {
   id: string
   title: string
@@ -29,18 +31,21 @@ type GoalInput = {
   completed: boolean
 }
 
+// 各目標期間区分ごとに目標配列を持つ
 type GoalsByPeriod = {
   short: GoalInput[]
   medium: GoalInput[]
   long: GoalInput[]
 }
 
+// 目標期間区分を番号で管理するための対応表
 const PERIODS: { key: Period; label: string; goalType: number }[] = [
   { key: "short", label: "短期", goalType: 1 },
   { key: "medium", label: "中期", goalType: 2 },
   { key: "long", label: "長期", goalType: 3 },
 ]
 
+// 空の目標を1件作成
 const emptyGoal = (): GoalInput => ({
   id: crypto.randomUUID(),
   title: "",
@@ -48,6 +53,7 @@ const emptyGoal = (): GoalInput => ({
   completed: false,
 })
 
+// 短期のみ空の入力欄を入れた初期状態
 const emptyGoalsByPeriod = (): GoalsByPeriod => ({
   short: [emptyGoal()],
   medium: [],
@@ -55,6 +61,7 @@ const emptyGoalsByPeriod = (): GoalsByPeriod => ({
 })
 
 export default function Home() {
+// 画面上の入力値を保持する
   const [goalsByPeriod, setGoalsByPeriod] =
     useState<GoalsByPeriod>(emptyGoalsByPeriod)
   const [weekdayHour, setWeekdayHour] = useState("")
@@ -63,9 +70,11 @@ export default function Home() {
   const [holidayMinute, setHolidayMinute] = useState("")
   const [memo, setMemo] = useState("")
 
+// Select用の時・分の選択肢
   const hours = Array.from({ length: 24 }, (_, i) => i)
   const minutes = Array.from({ length: 60 }, (_, i) => i)
 
+// 画面表示時に目標入力 API から設定を取得してフォームに反映する
   useEffect(() => {
     const fetchGoalSettings = async () => {
       try {
@@ -113,6 +122,7 @@ export default function Home() {
     fetchGoalSettings()
   }, [])
 
+// 目標の追加・更新・削除・完了切り替え
   const addGoal = (period: Period) => {
     setGoalsByPeriod((prev) => ({
       ...prev,
@@ -157,6 +167,7 @@ export default function Home() {
     })
   }
 
+// 登録ボタン押下時: 送信用データを整え、入力チェック後に目標入力APIへPOSTする
   const handleRegister = async () => {
     const goals = PERIODS.flatMap(({ key, goalType }) =>
       goalsByPeriod[key]
@@ -213,6 +224,7 @@ export default function Home() {
       </p>
 
       <CardContent className="flex flex-col gap-6">
+        {/* 短期・中期・長期の目標入力 */}
         {PERIODS.map(({ key, label }) => (
           <Card key={key} size="sm">
             <CardContent className="flex flex-col gap-3">
@@ -269,6 +281,7 @@ export default function Home() {
           </Card>
         ))}
 
+        {/* 平日の目標学習時間 */}
         <Card size="sm">
           <CardContent>
             <p>平日目標学習時間</p>
@@ -303,6 +316,7 @@ export default function Home() {
           </CardContent>
         </Card>
 
+        {/* 休日の目標学習時間 */}
         <Card size="sm">
           <CardContent>
             <p>休日目標学習時間</p>
@@ -337,6 +351,7 @@ export default function Home() {
           </CardContent>
         </Card>
 
+        {/* メモ（任意） */}
         <Card size="sm">
           <CardContent>
             <p>メモ（任意）</p>
@@ -349,6 +364,7 @@ export default function Home() {
         </Card>
       </CardContent>
 
+      {/* 登録ボタン */}
       <CardFooter className="mt-6 border-t-0 bg-transparent flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Button className="w-full sm:w-auto" onClick={handleRegister}>
           登録

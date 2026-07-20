@@ -72,13 +72,18 @@ export async function POST(request: Request) {
       tasks,
     } = body
 
+    const validTasks = (tasks ?? []).filter(
+      (task: { study_task?: string }) => task.study_task?.trim()
+    )
+
     if (
       !study_date ||
       study_hours === undefined ||
       study_hours === "" ||
       study_minutes === undefined ||
       study_minutes === "" ||
-      !subject
+      !subject ||
+      validTasks.length === 0
     ) {
       return NextResponse.json(
         { error: "未入力の項目があります" },
@@ -86,15 +91,15 @@ export async function POST(request: Request) {
       )
     }
 
-    const taskRows = (tasks ?? [])
-      .filter((task: { study_task?: string }) => task.study_task?.trim())
-      .map((task: { study_task: string; is_completed?: boolean }, index: number) => ({
+    const taskRows = validTasks.map(
+      (task: { study_task: string; is_completed?: boolean }, index: number) => ({
         user_id: userId,
         study_date: new Date(study_date),
         study_task_id: index + 1,
         study_task: task.study_task,
         is_completed: task.is_completed ?? false,
-      }))
+      })
+    )
 
     await prisma.$transaction(async (tx) => {
       await tx.studyRecord.upsert({

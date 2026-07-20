@@ -20,12 +20,14 @@ import {
 
 import { Button } from '@/components/ui/button'
 
+// タスク1件の型
 type Task = {
   id: number
   text: string
   completed: boolean
 }
 
+// 今日の日付を YYYY-MM-DD 形式で返す
 function getTodayString(): string {
   const today =new Date()
   const year = today.getFullYear()
@@ -36,9 +38,11 @@ function getTodayString(): string {
 
 export default function Home() {
 
+// Select用の時・分の選択肢
   const hours = Array.from({ length: 24 }, (_, i) => i)
   const minutes = Array.from({ length: 60 }, (_, i) => i)
 
+// 画面上の入力値を保持する
   const [studyDate, setStudyDate] = useState(getTodayString)
   const [tasks, setTasks] = useState<Task[]>([
     { id: 1, text: "", completed: false },
@@ -51,6 +55,7 @@ export default function Home() {
   const [memo, setMemo] = useState("")
   const [isSaving, setIsSaving ] = useState(false)
 
+// 学習日が変わったときに学習記録 API からデータを取得してフォームに反映する
   useEffect(() => {
     const controller = new AbortController()
     const fetchStudyRecord = async () => {
@@ -103,23 +108,27 @@ export default function Home() {
     }
   }, [studyDate])
 
+// タスク入力欄を1件追加
   const handleAddTask = () => {
     setTasks([...tasks, { id: Date.now(), text: "", completed: false }])
   }
 
+// 登録ボタン押下時: 入力チェック後に学習記録APIへPOSTする
   const handleSaveStudyRecord = async () => {
     if (isSaving) return
     setIsSaving(true)
     try {
+      const hasValidTask = tasks.some((task) => task.text.trim())
       const hasEmptyflection =
-      !studyDate ||
-      !studyHour ||
-      !studyMinute ||
-      !subject
-    if (hasEmptyflection) {
-      alert("未入力の項目があります")
-      return
-    }
+        !studyDate ||
+        !studyHour ||
+        !studyMinute ||
+        !subject ||
+        !hasValidTask
+      if (hasEmptyflection) {
+        alert("未入力の項目があります")
+        return
+      }
     const res = await fetch("/api/study-record", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -158,6 +167,7 @@ return (
   <div className="flex flex-col gap-6">
     <Card size="sm">
     <CardContent>
+      {/* 学習日選択 */}
       <p>学習日選択</p>
       <Input
         type="date"
@@ -167,6 +177,7 @@ return (
       />
     
     <div className="flex flex-col my-6 gap-2 sm:gap-3">
+    {/* 本日のタスク（目標） */}
     <div>
     <p>本日のタスク（目標）</p>
     <div className="flex flex-col gap-2 sm:gap-3">
@@ -210,6 +221,7 @@ return (
     </Button>
     </div>
 
+    {/* 本日の学習時間 */}
     <div>
       <p>本日の学習時間</p>
       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -242,6 +254,7 @@ return (
       </div>
     </div>
 
+    {/* 学習内容記入 */}
     <div className="flex flex-col my-6 gap-2 sm:gap-3">
       <p>学習内容記入</p>
       <textarea className="min-h-24 w-full rounded-lg border boeder-input bg-transoarent px-2.5 py-2 text-sm"
@@ -253,6 +266,7 @@ return (
         />
     </div>
 
+    {/* メモ */}
     <div>
       <p>メモ</p>
       <textarea 
@@ -267,6 +281,7 @@ return (
     </CardContent>
     </Card>
 
+    {/* 登録ボタン */}
     <CardFooter className="mt-6 border-t-0 bg-transparent flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
     <Button className="w-full sm:w-auto" onClick={handleSaveStudyRecord}>
           登録
