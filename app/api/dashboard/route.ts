@@ -1,7 +1,6 @@
+import { requireUserId } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
-
-const userId = "11111111-1111-1111-1111-111111111111"
 
 function toDateString(date: Date): string {
   const year = date.getFullYear()
@@ -42,6 +41,10 @@ function calcStreak(studyDates: Set<string>): number {
 }
 
 export async function GET() {
+  const auth = await requireUserId()
+  if (!auth.ok) return auth.response
+  const userId = auth.userId
+
   try {
     const today = toDateString(new Date())
     const todayDate = new Date(today)
@@ -134,6 +137,10 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const auth = await requireUserId()
+  if (!auth.ok) return auth.response
+  const userId = auth.userId
+
   try {
     const body = await request.json()
     const { study_task_id, is_completed } = body

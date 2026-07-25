@@ -1,7 +1,6 @@
+import { requireUserId } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
-
-const userId = "11111111-1111-1111-1111-111111111111"
 
 function getMonthRange(year: number, month: number) {
   const start = new Date(
@@ -16,6 +15,10 @@ function getMonthRange(year: number, month: number) {
 }
 
 export async function GET(request: Request) {
+  const auth = await requireUserId()
+  if (!auth.ok) return auth.response
+  const userId = auth.userId
+
   try {
     const { searchParams } = new URL(request.url)
     const studyYear = searchParams.get("study_year")

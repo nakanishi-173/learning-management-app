@@ -53,7 +53,18 @@ export default function Home() {
   const [studyMinute, setStudyMinute] = useState("")
   const [subject, setSubject] = useState("")
   const [memo, setMemo] = useState("")
-  const [isSaving, setIsSaving ] = useState(false)
+  const [hasExistingRecord, setHasExistingRecord] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const resetForm = () => {
+    setStudyHour("")
+    setStudyMinute("")
+    setSubject("")
+    setMemo("")
+    setTasks([{ id: 1, text: "", completed: false }])
+    setHasExistingRecord(false)
+  }
 
 // 学習日が変わったときに学習記録 API からデータを取得してフォームに反映する
   useEffect(() => {
@@ -74,11 +85,9 @@ export default function Home() {
           setStudyMinute(String(data.study_minutes))
           setSubject(data.subject)
           setMemo(data.memo ?? "")
+          setHasExistingRecord(true)
         } else {
-          setStudyHour("")
-          setStudyMinute("")
-          setSubject("")
-          setMemo("")
+          resetForm()
         }
         if (data.tasks && data.tasks.length > 0) {
           setTasks(
@@ -152,10 +161,33 @@ export default function Home() {
       return
     }
     alert("登録しました")
+    setHasExistingRecord(true)
   } finally {
     setIsSaving(false)
   }
 }
+
+  const handleDeleteStudyRecord = async () => {
+    if (isDeleting || !hasExistingRecord) return
+    if (!confirm(`${studyDate} の学習記録を削除しますか？`)) return
+
+    setIsDeleting(true)
+    try {
+      const res = await fetch(
+        `/api/study-record?study_date=${studyDate}`,
+        { method: "DELETE" }
+      )
+      if (!res.ok) {
+        const { error } = await res.json()
+        alert(error ?? "学習記録の削除に失敗しました")
+        return
+      }
+      alert("削除しました")
+      resetForm()
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
 return (
   <div className="mx-auto max-w-md md:max-w-lg lg:max-w-xl">
@@ -283,10 +315,25 @@ return (
 
     {/* 登録ボタン */}
     <CardFooter className="mt-6 border-t-0 bg-transparent flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-    <Button className="w-full sm:w-auto" onClick={handleSaveStudyRecord}>
-          登録
+      {hasExistingRecord && (
+        <Button
+          type="button"
+          variant="destructive"
+          className="w-full sm:w-auto"
+          disabled={isDeleting || isSaving}
+          onClick={handleDeleteStudyRecord}
+        >
+          削除
         </Button>
-      </CardFooter> 
+      )}
+      <Button
+        className="w-full sm:w-auto"
+        disabled={isSaving || isDeleting}
+        onClick={handleSaveStudyRecord}
+      >
+        登録
+      </Button>
+    </CardFooter> 
   </div>
   </div>
 )

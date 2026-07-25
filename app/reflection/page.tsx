@@ -92,7 +92,7 @@ export default function Home() {
       setError("")
       try {
         const res = await fetch(
-          `/api/reflection?study_year=${year}&study_month=${month}`,
+          `/api/monthly-summary?study_year=${year}&study_month=${month}`,
           { signal: controller.signal }
         )
         if (!res.ok) {

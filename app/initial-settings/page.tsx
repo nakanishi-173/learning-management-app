@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 
@@ -63,6 +64,7 @@ const emptyGoalsByPeriod = (): GoalsByPeriod => ({
 })
 
 export default function Home() {
+  const router = useRouter()
 // 画面上の入力値を保持する
   const [languages, setLanguages] = useState<Language[]>([])
   const [language, setLanguage] = useState("")
@@ -169,7 +171,8 @@ export default function Home() {
       return
     }
 
-    alert("保存しました")
+    router.push("/")
+    router.refresh()
   }
 
 // 目標の追加・更新・削除

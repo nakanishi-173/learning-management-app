@@ -1,9 +1,12 @@
+import { requireUserId } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 
-const userId = "11111111-1111-1111-1111-111111111111"
-
 export async function GET(request: Request) {
+  const auth = await requireUserId()
+  if (!auth.ok) return auth.response
+  const userId = auth.userId
+
   try {
     const { searchParams } = new URL(request.url)
     const studyDate = searchParams.get("study_date")
@@ -60,6 +63,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireUserId()
+  if (!auth.ok) return auth.response
+  const userId = auth.userId
+
   try {
     const body = await request.json()
 
@@ -145,6 +152,66 @@ export async function POST(request: Request) {
     console.error(error)
     return NextResponse.json(
       { error: "学習記録の保存に失敗しました" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(request: Request) {
+  const auth = await requireUserId()
+  if (!auth.ok) return auth.response
+  const userId = auth.userId
+
+  try {
+    const { searchParams } = new URL(request.url)
+    const studyDate = searchParams.get("study_date")
+
+    if (!studyDate) {
+      return NextResponse.json(
+        { error: "学習日が指定されていません" },
+        { status: 400 }
+      )
+    }
+
+    const existing = await prisma.studyRecord.findUnique({
+      where: {
+        user_id_study_date: {
+          user_id: userId,
+          study_date: new Date(studyDate),
+        },
+      },
+    })
+
+    if (!existing) {
+      return NextResponse.json(
+        { error: "学習記録が見つかりません" },
+        { status: 404 }
+      )
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.studyTask.deleteMany({
+        where: {
+          user_id: userId,
+          study_date: new Date(studyDate),
+        },
+      })
+
+      await tx.studyRecord.delete({
+        where: {
+          user_id_study_date: {
+            user_id: userId,
+            study_date: new Date(studyDate),
+          },
+        },
+      })
+    })
+
+    return NextResponse.json({ message: "削除しました" })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      { error: "学習記録の削除に失敗しました" },
       { status: 500 }
     )
   }

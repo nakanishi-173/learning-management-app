@@ -1,5 +1,6 @@
-import { Header } from './components/Header'
 import { Footer } from './components/Footer'
+import { Header } from './components/Header'
+import { OnboardingGuard } from './components/OnboardingGuard'
 import './globals.css'
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,9 @@ export default function RootLayout({
     <html lang="ja" className={cn("font-sans", geist.variable)}>
       <body>
         <Header />
-        <main>{children}</main>
+        <main>
+          <OnboardingGuard>{children}</OnboardingGuard>
+        </main>
         <Footer />
       </body>
     </html>

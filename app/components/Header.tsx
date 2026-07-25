@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { MenuIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -13,9 +13,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { createClient } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 
 const navItems = [
+  { href: "/", label: "ダッシュボード" },
   { href: "/study-record-input", label: "学習記録入力" },
   { href: "/goal-settings", label: "目標入力" },
   { href: "/reflection", label: "振り返り" },
@@ -26,8 +28,19 @@ const navItems = [
   },
 ] as const
 
+const AUTH_ROUTES = ["/login", "/signup"]
+
 export const Header = () => {
   const pathname = usePathname()
+  const router = useRouter()
+  const showLogout = !AUTH_ROUTES.includes(pathname)
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push("/login")
+    router.refresh()
+  }
 
   return (
     <header className="mx-auto max-w-md md:max-w-lg lg:max-w-xl bg-slate-800 p-1 text-white">
@@ -66,6 +79,18 @@ export const Header = () => {
                   </Link>
                 </SheetClose>
               ))}
+              {showLogout ? (
+                <SheetClose asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="mt-4 w-full"
+                    onClick={handleLogout}
+                  >
+                    ログアウト
+                  </Button>
+                </SheetClose>
+              ) : null}
             </nav>
           </SheetContent>
         </Sheet>
