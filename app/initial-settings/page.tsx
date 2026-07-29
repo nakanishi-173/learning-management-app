@@ -74,6 +74,7 @@ export default function Home() {
   const [weekdayMinute, setWeekdayMinute] = useState("")
   const [holidayHour, setHolidayHour] = useState("")
   const [holidayMinute, setHolidayMinute] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
 
 // Select用の時・分の選択肢
   const hours = Array.from({ length: 24 }, (_, i) => i)
@@ -82,6 +83,7 @@ export default function Home() {
 // 画面表示時に初期設定 API から言語・設定を取得してフォームに反映する
   useEffect(() => {
     const fetchInitialSettings = async () => {
+      setIsLoading(true)
       try {
         const res = await fetch("/api/initial-settings")
         if (!res.ok) {
@@ -123,6 +125,8 @@ export default function Home() {
         }
       } catch (error) {
         console.error(error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -209,6 +213,9 @@ export default function Home() {
         プログラミング言語学習における目標を設定してください。
       </p>
 
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">読み込み中...</p>
+      ) : (
       <CardContent className="flex flex-col gap-6">
         <div className="flex flex-col gap-6">
 
@@ -359,13 +366,16 @@ export default function Home() {
           </CardContent>
         </Card>
       </CardContent>
+      )}
 
       {/* 保存ボタン */}
+      {!isLoading && (
       <CardFooter className="mt-6 border-t-0 bg-transparent flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Button className="w-full sm:w-auto" onClick={handleRegister}>
           保存
         </Button>
       </CardFooter>
+      )}
     </div>
   )
 }

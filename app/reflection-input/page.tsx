@@ -45,6 +45,8 @@ export default function Home() {
   const [month, setMonth] = useState("")
   const [form, setForm] = useState<ReflectionInput>(emptyForm())
   const [hasExistingReflection, setHasExistingReflection] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -52,11 +54,13 @@ export default function Home() {
     if (!year || !month) {
       setForm(emptyForm())
       setHasExistingReflection(false)
+      setIsLoading(false)
       return
     }
 
     const controller = new AbortController()
     const fetchReflection = async () => {
+      setIsLoading(true)
       try {
         const res = await fetch(
           `/api/reflections?study_year=${year}&study_month=${month}`,
@@ -84,6 +88,8 @@ export default function Home() {
           return
         }
         console.error(error)
+      } finally {
+        setIsLoading(false)
       }
     }
     fetchReflection()
@@ -91,6 +97,35 @@ export default function Home() {
       controller.abort()
     }
   }, [year, month])
+
+  const handleGenerateDraft = async () => {
+    if (isGenerating || !year || !month) return
+    setIsGenerating(true)
+    try {
+      const res = await fetch("/api/reflections/draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          study_year: Number(year),
+          study_month: Number(month),
+        }),
+      })
+      if (!res.ok) {
+        const { error } = await res.json()
+        alert(error ?? "下書きの生成に失敗しました")
+        return
+      }
+      const data = await res.json()
+      setForm({
+        studyContent: data.study_content,
+        challenge: data.challenge,
+        improvement: data.improvement,
+        memo: data.memo ?? "",
+      })
+    } finally {
+      setIsGenerating(false)
+    }
+  }
 
   const handleSaveReflection = async () => {
     if (isSaving) return
@@ -194,11 +229,24 @@ export default function Home() {
               <span>月</span>
             </div>
 
+            {isLoading ? (
+              <p className="my-6 text-sm text-muted-foreground">読み込み中...</p>
+            ) : year && month ? (
             <div className="flex flex-col my-6 gap-2 sm:gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                disabled={isGenerating || isSaving || isDeleting}
+                onClick={handleGenerateDraft}
+              >
+                {isGenerating ? "下書き生成中…" : "下書き生成"}
+              </Button>
+
               <div>
                 <p>主に学習した内容</p>
                 <textarea
-                  className="min-h-24 w-full rounded-lg border boeder-input bg-transoarent px-2.5 py-2 text-sm"
+                  className="min-h-24 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm"
                   placeholder="学習内容"
                   value={form.studyContent}
                   onChange={(e) =>
@@ -210,7 +258,7 @@ export default function Home() {
               <div>
                 <p>課題</p>
                 <textarea
-                  className="min-h-24 w-full rounded-lg border boeder-input bg-transoarent px-2.5 py-2 text-sm"
+                  className="min-h-24 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm"
                   placeholder="学習した中で分からなかったところや学習ペースでの課題感など"
                   value={form.challenge}
                   onChange={(e) =>
@@ -222,7 +270,7 @@ export default function Home() {
               <div>
                 <p>改善案</p>
                 <textarea
-                  className="min-h-24 w-full rounded-lg border border-input bg-transoarent px-2.5 py-2 text-sm"
+                  className="min-h-24 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm"
                   placeholder="来月どう学習していくか、学習計画など"
                   value={form.improvement}
                   onChange={(e) =>
@@ -234,7 +282,7 @@ export default function Home() {
               <div>
                 <p>メモ</p>
                 <textarea
-                  className="min-h-24 w-full rounded-lg border border-input bg-transoarent px-2.5 py-2 text-sm"
+                  className="min-h-24 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm"
                   value={form.memo}
                   onChange={(e) =>
                     setForm({ ...form, memo: e.target.value })
@@ -242,16 +290,18 @@ export default function Home() {
                 />
               </div>
             </div>
+            ) : null}
           </CardContent>
         </Card>
 
+        {!isLoading && year && month && (
         <CardFooter className="mt-6 border-t-0 bg-transparent flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           {hasExistingReflection && (
             <Button
               type="button"
               variant="destructive"
               className="w-full sm:w-auto"
-              disabled={isDeleting || isSaving}
+              disabled={isDeleting || isSaving || isGenerating}
               onClick={handleDeleteReflection}
             >
               削除
@@ -259,12 +309,13 @@ export default function Home() {
           )}
           <Button
             className="w-full sm:w-auto"
-            disabled={isSaving || isDeleting}
+            disabled={isSaving || isDeleting || isGenerating}
             onClick={handleSaveReflection}
           >
             登録
           </Button>
         </CardFooter>
+        )}
       </div>
     </div>
   )

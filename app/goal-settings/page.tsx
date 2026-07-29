@@ -69,6 +69,7 @@ export default function Home() {
   const [holidayHour, setHolidayHour] = useState("")
   const [holidayMinute, setHolidayMinute] = useState("")
   const [memo, setMemo] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
 
 // Select用の時・分の選択肢
   const hours = Array.from({ length: 24 }, (_, i) => i)
@@ -77,6 +78,7 @@ export default function Home() {
 // 画面表示時に目標入力 API から設定を取得してフォームに反映する
   useEffect(() => {
     const fetchGoalSettings = async () => {
+      setIsLoading(true)
       try {
         const res = await fetch("/api/goal-settings")
         if (!res.ok) {
@@ -116,6 +118,8 @@ export default function Home() {
         setGoalsByPeriod(next)
       } catch (error) {
         console.error(error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -223,6 +227,9 @@ export default function Home() {
         プログラミング言語学習における目標を入力してください。
       </p>
 
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">読み込み中...</p>
+      ) : (
       <CardContent className="flex flex-col gap-6">
         {/* 短期・中期・長期の目標入力 */}
         {PERIODS.map(({ key, label }) => (
@@ -363,13 +370,16 @@ export default function Home() {
           </CardContent>
         </Card>
       </CardContent>
+      )}
 
       {/* 登録ボタン */}
+      {!isLoading && (
       <CardFooter className="mt-6 border-t-0 bg-transparent flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Button className="w-full sm:w-auto" onClick={handleRegister}>
           登録
         </Button>
       </CardFooter>
+      )}
     </div>
   )
 }

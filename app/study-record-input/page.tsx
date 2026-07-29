@@ -46,14 +46,13 @@ export default function Home() {
   const [studyDate, setStudyDate] = useState(getTodayString)
   const [tasks, setTasks] = useState<Task[]>([
     { id: 1, text: "", completed: false },
-    { id: 2, text: "", completed: false },
-    { id: 3, text: "", completed: false },
   ])
   const [studyHour, setStudyHour] = useState("")
   const [studyMinute, setStudyMinute] = useState("")
   const [subject, setSubject] = useState("")
   const [memo, setMemo] = useState("")
   const [hasExistingRecord, setHasExistingRecord] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -70,6 +69,7 @@ export default function Home() {
   useEffect(() => {
     const controller = new AbortController()
     const fetchStudyRecord = async () => {
+      setIsLoading(true)
       try {
         const res = await fetch(
           `/api/study-record?study_date=${studyDate}`,
@@ -109,6 +109,8 @@ export default function Home() {
           return
         }
         console.error(error)
+      } finally {
+        setIsLoading(false)
       }
     }
     fetchStudyRecord()
@@ -128,13 +130,13 @@ export default function Home() {
     setIsSaving(true)
     try {
       const hasValidTask = tasks.some((task) => task.text.trim())
-      const hasEmptyflection =
+      const hasEmptyField =
         !studyDate ||
         !studyHour ||
         !studyMinute ||
         !subject ||
         !hasValidTask
-      if (hasEmptyflection) {
+      if (hasEmptyField) {
         alert("未入力の項目があります")
         return
       }
@@ -207,14 +209,17 @@ return (
         onChange={(e) => setStudyDate(e.target.value)}
         className="w-40"
       />
-    
+
+    {isLoading ? (
+      <p className="my-6 text-sm text-muted-foreground">読み込み中...</p>
+    ) : (
     <div className="flex flex-col my-6 gap-2 sm:gap-3">
     {/* 本日のタスク（目標） */}
     <div>
     <p>本日のタスク（目標）</p>
     <div className="flex flex-col gap-2 sm:gap-3">
     {tasks.map((task)=> (
-      <div key={task.id} className="flex items-canter gap-2 sm:gap-3">
+      <div key={task.id} className="flex items-center gap-2 sm:gap-3">
         <div className="flex h-8 w-4 shrink-0 items-center justify-center">
         <input
           type="checkbox"
@@ -289,7 +294,7 @@ return (
     {/* 学習内容記入 */}
     <div className="flex flex-col my-6 gap-2 sm:gap-3">
       <p>学習内容記入</p>
-      <textarea className="min-h-24 w-full rounded-lg border boeder-input bg-transoarent px-2.5 py-2 text-sm"
+      <textarea className="min-h-24 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm"
           placeholder="学習内容"
           value={subject}
           onChange={(e) => 
@@ -302,7 +307,7 @@ return (
     <div>
       <p>メモ</p>
       <textarea 
-        className="min-h-24 w-full rounded-lg border boeder-input bg-transoarent px-2.5 py-2 text-sm"
+        className="min-h-24 w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm"
         value={memo}
         onChange={(e) => 
           setMemo(e.target.value)
@@ -310,10 +315,12 @@ return (
         />
     </div>
     </div>
+    )}
     </CardContent>
     </Card>
 
     {/* 登録ボタン */}
+    {!isLoading && (
     <CardFooter className="mt-6 border-t-0 bg-transparent flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
       {hasExistingRecord && (
         <Button
@@ -333,7 +340,8 @@ return (
       >
         登録
       </Button>
-    </CardFooter> 
+    </CardFooter>
+    )}
   </div>
   </div>
 )

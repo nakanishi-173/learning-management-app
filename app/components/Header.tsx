@@ -21,11 +21,7 @@ const navItems = [
   { href: "/study-record-input", label: "学習記録入力" },
   { href: "/goal-settings", label: "目標入力" },
   { href: "/reflection", label: "振り返り" },
-  {
-    href: "/progress",
-    label: "学習進捗グラフ・カレンダー",
-    comingSoon: true,
-  },
+  { href: "/progress", label: "学習進捗グラフ・カレンダー" },
 ] as const
 
 const AUTH_ROUTES = ["/login", "/signup"]
