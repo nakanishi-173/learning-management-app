@@ -67,11 +67,6 @@ export const Header = () => {
                     )}
                   >
                     {item.label}
-                    {"comingSoon" in item && item.comingSoon ? (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        （準備中）
-                      </span>
-                    ) : null}
                   </Link>
                 </SheetClose>
               ))}

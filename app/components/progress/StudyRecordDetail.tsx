@@ -62,11 +62,7 @@ export function StudyRecordDetail({
 
   // 選択日が変わったときに学習記録 API から詳細を取得する
   useEffect(() => {
-    if (!studyDate) {
-      setData(null)
-      setError("")
-      return
-    }
+    if (!studyDate) return
 
     const controller = new AbortController()
 

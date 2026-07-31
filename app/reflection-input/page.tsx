@@ -51,12 +51,7 @@ export default function Home() {
   const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    if (!year || !month) {
-      setForm(emptyForm())
-      setHasExistingReflection(false)
-      setIsLoading(false)
-      return
-    }
+    if (!year || !month) return
 
     const controller = new AbortController()
     const fetchReflection = async () => {
