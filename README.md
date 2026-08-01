@@ -58,6 +58,12 @@
 - **LLM**: OpenAI API（振り返り下書き生成）
 - **グラフ**: Recharts
 
+## データベース設計
+
+PostgreSQL（Supabase）上のテーブル構成です。ユーザー認証は Supabase Auth が担い、各テーブルの `user_id` で紐づけています。
+![データベース ER 図](./docs/er-diagram.png)
+
+
 ## ローカルでの起動手順
 
 ### 1. リポジトリのクローン
