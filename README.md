@@ -4,6 +4,14 @@
 学習記録の入力、ダッシュボードでの当日の学習進捗確認、月次振り返り、学習時間のグラフ・カレンダー表示に対応しています。  
 振り返り入力では OpenAI API を用いた下書き生成機能を提供します。
 
+## 制作背景
+
+プログラミング学習を続ける中で、成長実感が持てずモチベーション維持が難しいと感じていました。  
+成果がすぐに出なくても、学習量や継続状況を可視化できれば自己肯定感につながるのではないか、という思いから本アプリを制作しました。
+
+日常生活の中で学習習慣を定着させ、今後も使い続けられるツールにしたいという自分自身のニーズもあります。  
+同様にプログラミング言語の学習に取り組む方の継続を支援できるアプリを目指しています。
+
 ## ターゲット
 
 - プログラミング言語学習の記録を継続的に行うことが難しい人
@@ -36,6 +44,17 @@
 - **初期設定画面**は `/initial-settings` から直接確認できます。
 - **振り返り下書き生成（LLM）** は `/reflection-input` で「下書きを生成」ボタンから利用できます。
 
+## スクリーンショット
+
+### ダッシュボード
+![ダッシュボード](./docs/screenshots/dashboard.png)
+
+### 学習進捗（グラフ・カレンダー）
+![学習進捗](./docs/screenshots/progress.png)
+
+### 振り返り下書き生成
+![振り返り下書き生成](./docs/screenshots/reflection-input.png)
+
 ## 主な機能
 
 | 画面 | パス | 概要 |
@@ -53,15 +72,22 @@
 ## 技術スタック
 
 - **フロントエンド**: Next.js（App Router）, React, TypeScript, Tailwind CSS
+- **UI**: shadcn/ui, Radix UI, Lucide React
 - **認証**: Supabase Auth
 - **データベース**: PostgreSQL（Supabase）, Prisma
 - **LLM**: OpenAI API（振り返り下書き生成）
 - **グラフ**: Recharts
+- **ホスティング**: Vercel
 
 ## データベース設計
 
 PostgreSQL（Supabase）上のテーブル構成です。ユーザー認証は Supabase Auth が担い、各テーブルの `user_id` で紐づけています。
+
 ![データベース ER 図](./docs/er-diagram.png)
+
+## 前提条件
+- Node.js 20 以上
+- npm
 
 
 ## ローカルでの起動手順
@@ -94,6 +120,7 @@ cp .env.example .env.local
 | `DATABASE_URL` | PostgreSQL 接続文字列 | Supabase → Settings → Database |
 | `OPENAI_API_KEY` | OpenAI API キー | OpenAI Platform（振り返り下書き生成用） |
 
+> `OPENAI_API_KEY` は振り返り下書き生成機能のみ必要です。未設定でも他機能は利用できます。
 > `.env.local` は Git に含めません。API キーは README や GitHub に載せないでください。
 
 ### 4. データベースの準備

@@ -44,3 +44,5 @@ next-env.d.ts
 /lib/generated/prisma
 /docs/*
 !/docs/er-diagram.png
+!/docs/screenshots/
+!/docs/screenshots/*.png
