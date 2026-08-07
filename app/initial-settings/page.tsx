@@ -63,7 +63,7 @@ const emptyGoalsByPeriod = (): GoalsByPeriod => ({
   long: [emptyGoal()],
 })
 
-export default function Home() {
+export default function InitialSettingsPage() {
   const router = useRouter()
 // 画面上の入力値を保持する
   const [languages, setLanguages] = useState<Language[]>([])

@@ -60,7 +60,7 @@ const emptyGoalsByPeriod = (): GoalsByPeriod => ({
   long: [],
 })
 
-export default function Home() {
+export default function GoalSettingsPage() {
 // 画面上の入力値を保持する
   const [goalsByPeriod, setGoalsByPeriod] =
     useState<GoalsByPeriod>(emptyGoalsByPeriod)

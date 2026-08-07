@@ -40,7 +40,7 @@ const emptyForm = (): ReflectionInput => ({
   memo: "",
 })
 
-export default function Home() {
+export default function ReflectionInputPage() {
   const [year, setYear] = useState("")
   const [month, setMonth] = useState("")
   const [form, setForm] = useState<ReflectionInput>(emptyForm())
