@@ -75,7 +75,7 @@ function DisplayField({
   )
 }
 
-export default function Home() {
+export default function ReflectionPage() {
   const router = useRouter()
   const [year, setYear] = useState(getDefaultYear)
   const [month, setMonth] = useState(getDefaultMonth)

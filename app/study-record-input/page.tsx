@@ -36,7 +36,7 @@ function getTodayString(): string {
   return `${year}-${month}-${day}`
 }
 
-export default function Home() {
+export default function StudyRecordInputPage() {
 
 // Select用の時・分の選択肢
   const hours = Array.from({ length: 24 }, (_, i) => i)
