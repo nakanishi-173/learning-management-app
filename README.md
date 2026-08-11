@@ -141,3 +141,41 @@ npm run dev
 ```
 
 ブラウザで [http://localhost:3000](http://localhost:3000) を開きます。
+
+## 改善ロードマップ
+
+コードレビューおよびポートフォリオ改善のため、GitHub Issues でタスクを管理しています。  
+実装が完了した項目には完了日を記載します（未完了は日付なし）。
+
+### フェーズ① レビュー指摘・軽微な修正
+
+コードレビューで指摘された命名・UI・導線の不整合を、小さな単位で修正するフェーズです。
+
+- [x] ページ export 名を XxxPage に統一（2026-08-07） — [#5](https://github.com/nakanishi-173/learning-management-app/issues/5)
+- [ ] Footer コピーライト表記の修正 — [#6](https://github.com/nakanishi-173/learning-management-app/issues/6)
+- [ ] ログイン画面でヘッダーメニューを非表示 — [#7](https://github.com/nakanishi-173/learning-management-app/issues/7)
+- [ ] ヘッダーメニューに「振り返り入力」を追加 — [#8](https://github.com/nakanishi-173/learning-management-app/issues/8)
+- [ ] 学習記録入力画面のタスクに削除ボタンを追加 — [#9](https://github.com/nakanishi-173/learning-management-app/issues/9)
+
+### フェーズ② UX・導線の改善
+
+モバイル向け UI に合わせ、ナビゲーション・遷移・ダッシュボード表示を整えるフェーズです。
+
+- [ ] ログイン中のアカウント情報とログアウトを Header に表示 — [#11](https://github.com/nakanishi-173/learning-management-app/issues/11)
+- [ ] ダッシュボードに目標一覧を追加 — [#12](https://github.com/nakanishi-173/learning-management-app/issues/12)
+- [ ] 登録・ログイン後の自動遷移を整理 — [#13](https://github.com/nakanishi-173/learning-management-app/issues/13)
+- [ ] 各登録画面の登録成功後に自動遷移 — [#14](https://github.com/nakanishi-173/learning-management-app/issues/14)
+- [ ] ナビゲーションを下部タブ（1行）に変更 — [#15](https://github.com/nakanishi-173/learning-management-app/issues/15)
+
+### フェーズ③ 機能追加
+
+PWA・認証・ダッシュボード強化・Push リマインドなど、継続利用を支援する機能を追加するフェーズです。
+
+- [ ] PWA 対応（ホーム画面への追加） — [#16](https://github.com/nakanishi-173/learning-management-app/issues/16)
+- [ ] パスワードリセット — [#17](https://github.com/nakanishi-173/learning-management-app/issues/17)
+- [ ] ダッシュボードに前日比学習時間 — [#18](https://github.com/nakanishi-173/learning-management-app/issues/18)
+- [ ] 学習記録未入力時の Push リマインド — [#19](https://github.com/nakanishi-173/learning-management-app/issues/19)
+- [ ] リマインド通知時刻のユーザー設定 — [#20](https://github.com/nakanishi-173/learning-management-app/issues/20)
+
+> 実装順の目安: フェーズ① → ②（#13 → #14、#15 → #11）→ ③（#16 → #19 → #20）。詳細は [Issues](https://github.com/nakanishi-173/learning-management-app/issues) を参照。
+
