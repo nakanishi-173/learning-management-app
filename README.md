@@ -152,7 +152,7 @@ npm run dev
 コードレビューで指摘された命名・UI・導線の不整合を、小さな単位で修正するフェーズです。
 
 - [x] ページ export 名を XxxPage に統一（2026-08-07） — [#5](https://github.com/nakanishi-173/learning-management-app/issues/5)
-- [ ] Footer コピーライト表記の修正 — [#6](https://github.com/nakanishi-173/learning-management-app/issues/6)
+- [x] Footer コピーライト表記の修正（2026-08-13） — [#6](https://github.com/nakanishi-173/learning-management-app/issues/6)
 - [ ] ログイン画面でヘッダーメニューを非表示 — [#7](https://github.com/nakanishi-173/learning-management-app/issues/7)
 - [ ] ヘッダーメニューに「振り返り入力」を追加 — [#8](https://github.com/nakanishi-173/learning-management-app/issues/8)
 - [ ] 学習記録入力画面のタスクに削除ボタンを追加 — [#9](https://github.com/nakanishi-173/learning-management-app/issues/9)
