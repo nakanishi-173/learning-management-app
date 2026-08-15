@@ -30,6 +30,7 @@ export const Header = () => {
   const pathname = usePathname()
   const router = useRouter()
   const showLogout = !AUTH_ROUTES.includes(pathname)
+  const showMenu = !AUTH_ROUTES.includes(pathname)
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -41,6 +42,7 @@ export const Header = () => {
   return (
     <header className="mx-auto max-w-md md:max-w-lg lg:max-w-xl bg-slate-800 p-1 text-white">
       <div className="flex items-center gap-2">
+        {showMenu ? (
         <Sheet>
           <SheetTrigger asChild>
             <Button
@@ -85,6 +87,7 @@ export const Header = () => {
             </nav>
           </SheetContent>
         </Sheet>
+        ) : null }
         <h1 className="text-sm font-medium sm:text-base">
           プログラミング言語学習管理アプリ
         </h1>
