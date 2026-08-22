@@ -124,6 +124,17 @@ export default function StudyRecordInputPage() {
     setTasks([...tasks, { id: Date.now(), text: "", completed: false }])
   }
 
+// タスク入力欄を1件削除
+  const removeTask = (id: number) => {
+    setTasks((prev) => {
+      const next = prev.filter((t) => t.id !== id)
+      if(next.length === 0){
+        return [{ id: Date.now(), text: "", completed: false}]
+      }
+      return next
+    })
+  }
+
 // 登録ボタン押下時: 入力チェック後に学習記録APIへPOSTする
   const handleSaveStudyRecord = async () => {
     if (isSaving) return
@@ -244,6 +255,13 @@ return (
           placeholder="タスクを入力"
           className="flex-1"
         />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => removeTask(task.id)}
+        >
+          削除
+        </Button>
       </div>
     ))}
     </div>
