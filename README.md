@@ -155,7 +155,7 @@ npm run dev
 - [x] Footer コピーライト表記の修正（2026-08-13） — [#6](https://github.com/nakanishi-173/learning-management-app/issues/6)
 - [x] ログイン画面でヘッダーメニューを非表示（2026-08-15） — [#7](https://github.com/nakanishi-173/learning-management-app/issues/7)
 - [x] ヘッダーメニューに「振り返り入力」を追加（2026-08-22） — [#8](https://github.com/nakanishi-173/learning-management-app/issues/8)
-- [ ] 学習記録入力画面のタスクに削除ボタンを追加 — [#9](https://github.com/nakanishi-173/learning-management-app/issues/9)
+- [x] 学習記録入力画面のタスクに削除ボタンを追加（2026-08-22） — [#9](https://github.com/nakanishi-173/learning-management-app/issues/9)
 
 ### フェーズ② UX・導線の改善
 
