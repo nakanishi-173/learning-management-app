@@ -20,6 +20,7 @@ const navItems = [
   { href: "/", label: "ダッシュボード" },
   { href: "/study-record-input", label: "学習記録入力" },
   { href: "/goal-settings", label: "目標入力" },
+  { href: "/reflection-input", label: "振り返り入力"},
   { href: "/reflection", label: "振り返り" },
   { href: "/progress", label: "学習進捗グラフ・カレンダー" },
 ] as const
